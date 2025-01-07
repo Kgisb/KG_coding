@@ -11,10 +11,10 @@ def load_data():
 
 data = load_data()
 
-# App Title
+# Streamlit App Title
 st.title("Data Filter and Sort Dashboard")
 
-# Sidebar Filters
+# Sidebar for User Input
 st.sidebar.header("Filters")
 ac_names = ["All"] + data['AC Name'].unique().tolist()
 selected_ac_name = st.sidebar.selectbox("Select AC Name:", ac_names)
