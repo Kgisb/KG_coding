@@ -1,5 +1,26 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
+import subprocess
+import sys
+
+# Function to install a package
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# Ensure required packages are installed
+try:
+    import pandas as pd
+    import plotly.express as px
+    import streamlit as st
+except ImportError as e:
+    package = e.name
+    print(f"Installing missing package: {package}")
+    install(package)
+    import pandas as pd
+    import plotly.express as px
+    import streamlit as st
+
 pip install pandas plotly streamlit
 streamlit run streamlit_sales_dashboard.py
 import pandas as pd
