@@ -1,67 +1,53 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import pandas as pd
 import streamlit as st
 
-# Streamlit App Title
-st.title("Interactive Sales Tracker Dashboard")
-
 # Load Google Sheet data (publicly accessible)
-st.write("Loading data from Google Sheets...")
-try:
-    # Replace this link with your public Google Sheet link
-    sheet_url = "https://docs.google.com/spreadsheets/d/16U4reJDdvGQb6lqN9LF-A2QVwsJdNBV1CqqcyuHcHXk/export?format=csv&gid=2006560046"
-    data = pd.read_csv(sheet_url)
-    st.write("Data successfully loaded!")
-except Exception as e:
-    st.error(f"Failed to load data: {e}")
-    st.stop()
+sheet_url = "https://docs.google.com/spreadsheets/d/16U4reJDdvGQb6lqN9LF-A2QVwsJdNBV1CqqcyuHcHXk/export?format=csv&gid=2006560046"
+data = pd.read_csv(sheet_url)
 
 # Ensure the Date column is in datetime format
-try:
-    data['Date'] = pd.to_datetime(data['Date'], errors='coerce')  # Handles invalid dates
-except Exception as e:
-    st.error(f"Failed to parse 'Date' column: {e}")
-    st.stop()
+data['Date'] = pd.to_datetime(data['Date'])
 
-# Sidebar Filters
-st.sidebar.header("Filters")
-ac_name = st.sidebar.selectbox("Select AC Name:", ["All"] + data['AC Name'].dropna().unique().tolist())
-start_date = st.sidebar.date_input("Start Date", value=data['Date'].min())
-end_date = st.sidebar.date_input("End Date", value=data['Date'].max())
+# Title of the Streamlit app
+st.title("Data Filter and Sort Dashboard")
 
-# Filter Data
-try:
+# Dropdown for selecting AC Name
+ac_names = ["All"] + data['AC Name'].unique().tolist()
+selected_ac_name = st.selectbox("Select AC Name:", ac_names)
+
+# Date range selection
+start_date = st.date_input("Start Date", value=data['Date'].min().date())
+end_date = st.date_input("End Date", value=data['Date'].max().date())
+
+# Filter and sort the data
+def filter_and_sort_data(ac_name, start_date, end_date):
     filtered_data = data.copy()
+
+    # Filter by AC Name if not "All"
     if ac_name != "All":
         filtered_data = filtered_data[filtered_data['AC Name'] == ac_name]
+
+    # Filter by date range
     filtered_data = filtered_data[
         (filtered_data['Date'] >= pd.to_datetime(start_date)) &
         (filtered_data['Date'] <= pd.to_datetime(end_date))
     ]
-except Exception as e:
-    st.error(f"Failed to filter data: {e}")
-    st.stop()
+    
+    # Sort by Date
+    filtered_data = filtered_data.sort_values(by="Date")
+    return filtered_data
 
-# Aggregated Metrics
-try:
-    summary = filtered_data.groupby('AC Name').agg({
-        'Cash-in': 'sum',
-        'Enrl': 'sum',
-        'SGR Conversion': 'sum',
-        'Fresh Leads': 'sum',
-        'SGR Leads': 'sum',
-        'Overall Leads': 'sum'
-    }).reset_index()
-except Exception as e:
-    st.error(f"Failed to aggregate data: {e}")
-    st.stop()
+# Filter and display the data
+filtered_data = filter_and_sort_data(selected_ac_name, start_date, end_date)
 
-# Display Filtered Data
-st.header("Filtered Data")
+st.write(f"Filtered Data ({len(filtered_data)} rows):")
 st.dataframe(filtered_data)
 
-# Display Summary Metrics
-st.header("Summary Metrics")
-st.dataframe(summary)
+# Optionally, allow the user to download the filtered data
+csv = filtered_data.to_csv(index=False)
+st.download_button(
+    label="Download Filtered Data as CSV",
+    data=csv,
+    file_name="filtered_data.csv",
+    mime="text/csv",
+)
