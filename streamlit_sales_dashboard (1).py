@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+pip install pandas plotly streamlit
+streamlit run streamlit_sales_dashboard.py
 import pandas as pd
 import plotly.express as px
 import streamlit as st
