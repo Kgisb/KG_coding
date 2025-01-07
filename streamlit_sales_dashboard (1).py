@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 
 # Streamlit App Title
@@ -63,14 +62,6 @@ except Exception as e:
 st.header("Filtered Data")
 st.dataframe(filtered_data)
 
-# Visualization
-st.header("Performance Metrics by AC")
-if not summary.empty:
-    try:
-        fig = px.bar(summary, x='AC Name', y=['Cash-in', 'Enrl', 'SGR Conversion'], barmode='group',
-                     title="Performance Metrics by AC")
-        st.plotly_chart(fig)
-    except Exception as e:
-        st.error(f"Failed to generate visualization: {e}")
-else:
-    st.write("No data available for the selected filters.")
+# Display Summary Metrics
+st.header("Summary Metrics")
+st.dataframe(summary)
