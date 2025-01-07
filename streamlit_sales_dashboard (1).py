@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+
 import os
 import subprocess
 import sys
@@ -20,12 +21,6 @@ except ImportError as e:
     import pandas as pd
     import plotly.express as px
     import streamlit as st
-
-pip install pandas plotly streamlit
-streamlit run streamlit_sales_dashboard.py
-import pandas as pd
-import plotly.express as px
-import streamlit as st
 
 # Streamlit App Title
 st.title("Interactive Sales Tracker Dashboard")
